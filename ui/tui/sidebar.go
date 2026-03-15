@@ -33,6 +33,23 @@ type Sidebar struct {
 	height  int
 }
 
+// shortNames maps tool IDs to compact sidebar labels.
+var shortNames = map[string]string{
+	"base64": "Base64",
+	"jwt":    "JWT Decoder",
+	"url":    "URL Tools",
+	"json":   "JSON Formatter",
+	"hash":   "Hash Generator",
+	"uuid":   "UUID Generator",
+}
+
+func sidebarLabel(t tools.Tool) string {
+	if short, ok := shortNames[t.ID()]; ok {
+		return short
+	}
+	return t.Name()
+}
+
 // NewSidebar creates a sidebar from the registry, grouped by category.
 func NewSidebar(reg *registry.Registry) Sidebar {
 	var entries []sidebarEntry
@@ -47,7 +64,7 @@ func NewSidebar(reg *registry.Registry) Sidebar {
 		for _, t := range toolsInCat {
 			entries = append(entries, sidebarEntry{
 				kind:     entryTool,
-				label:    t.Name(),
+				label:    sidebarLabel(t),
 				toolID:   t.ID(),
 				toolInfo: t,
 			})
