@@ -49,6 +49,7 @@ func init() {
 	rootCmd.AddCommand(diffCmd)
 	rootCmd.AddCommand(xmlCmd)
 	rootCmd.AddCommand(csvCmd)
+	rootCmd.AddCommand(desktopCmd)
 }
 
 // Execute runs the root command.
