@@ -33,6 +33,7 @@ func init() {
 	rootCmd.AddCommand(urlCmd)
 	rootCmd.AddCommand(uuidCmd)
 	rootCmd.AddCommand(tuiCmd)
+	rootCmd.AddCommand(webCmd)
 }
 
 // Execute runs the root command.

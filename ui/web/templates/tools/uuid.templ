@@ -1,0 +1,72 @@
+package tools
+
+import "github.com/StanMarek/forge/ui/web/templates"
+
+templ UUIDPage(result string, errMsg string, mode string, version int, uppercase bool, noHyphens bool, input string) {
+	@templates.Layout("UUID Generator", "uuid") {
+		<h1 class="tool-title">UUID Generate / Validate / Parse</h1>
+		<form hx-post="/tools/uuid" hx-target="#output" hx-swap="outerHTML" hx-trigger="input changed delay:200ms, change">
+			<div class="tool-options">
+				<div class="mode-pills">
+					<label class="mode-pill">
+						<input type="radio" name="mode" value="generate" if mode == "" || mode == "generate" { checked }/>
+						Generate
+					</label>
+					<label class="mode-pill">
+						<input type="radio" name="mode" value="validate" if mode == "validate" { checked }/>
+						Validate
+					</label>
+					<label class="mode-pill">
+						<input type="radio" name="mode" value="parse" if mode == "parse" { checked }/>
+						Parse
+					</label>
+				</div>
+				<div class="mode-pills">
+					<label class="mode-pill">
+						<input type="radio" name="version" value="4" if version != 7 { checked }/>
+						v4
+					</label>
+					<label class="mode-pill">
+						<input type="radio" name="version" value="7" if version == 7 { checked }/>
+						v7
+					</label>
+				</div>
+				<label class="checkbox-label">
+					<input type="checkbox" name="uppercase" if uppercase { checked }/>
+					Uppercase
+				</label>
+				<label class="checkbox-label">
+					<input type="checkbox" name="no-hyphens" if noHyphens { checked }/>
+					No hyphens
+				</label>
+			</div>
+			if mode == "validate" || mode == "parse" {
+				<div class="input-group">
+					<span class="form-label">UUID Input</span>
+					<textarea name="input" rows="2" placeholder="Enter UUID to validate or parse...">{ input }</textarea>
+				</div>
+			}
+			@UUIDOutput(result, errMsg)
+		</form>
+		<footer>All processing happens locally.</footer>
+	}
+}
+
+templ UUIDOutput(result string, errMsg string) {
+	<div id="output">
+		<div class="output-group">
+			<span class="form-label">Output</span>
+			if errMsg != "" {
+				<div class="error-box">{ errMsg }</div>
+			} else {
+				<textarea readonly rows="4">{ result }</textarea>
+			}
+		</div>
+		if result != "" {
+			<div class="actions">
+				<button type="button" class="btn" data-copy-btn onclick="copyOutput()">Copy</button>
+			</div>
+		}
+	</div>
+}
+

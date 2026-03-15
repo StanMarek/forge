@@ -1,0 +1,43 @@
+package templates
+
+templ Layout(title string, activeTool string) {
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<title>{ title } — Forge</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com"/>
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+		<link rel="stylesheet" href="/static/style.css"/>
+		<script src="/static/htmx.min.js"></script>
+	</head>
+	<body>
+		<header>
+			<div style="display:flex;align-items:center;gap:0.75rem">
+				<button class="hamburger" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+				<a href="/" class="logo"><span class="anvil">⚒</span> Forge</a>
+			</div>
+			<span class="header-meta">dev</span>
+		</header>
+		<div class="app-container">
+			<nav class="sidebar">
+				<div class="sidebar-category">Encoders</div>
+				<a href="/tools/base64" class={ "sidebar-item", templ.KV("active", activeTool == "base64") }>Base64</a>
+				<a href="/tools/jwt" class={ "sidebar-item", templ.KV("active", activeTool == "jwt") }>JWT Decoder</a>
+				<a href="/tools/url" class={ "sidebar-item", templ.KV("active", activeTool == "url") }>URL Tools</a>
+				<div class="sidebar-category">Formatters</div>
+				<a href="/tools/json" class={ "sidebar-item", templ.KV("active", activeTool == "json") }>JSON Formatter</a>
+				<div class="sidebar-category">Generators</div>
+				<a href="/tools/hash" class={ "sidebar-item", templ.KV("active", activeTool == "hash") }>Hash Generator</a>
+				<a href="/tools/uuid" class={ "sidebar-item", templ.KV("active", activeTool == "uuid") }>UUID Generator</a>
+			</nav>
+			<main>
+				{ children... }
+			</main>
+		</div>
+		<script src="/static/forge.js"></script>
+	</body>
+	</html>
+}

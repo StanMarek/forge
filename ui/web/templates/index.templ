@@ -1,0 +1,31 @@
+package templates
+
+templ IndexPage() {
+	@Layout("Home", "") {
+		<div class="tool-grid">
+			<h2>Encoders</h2>
+			<div class="grid">
+				@toolCard("/tools/base64", "Base64", "Encode and decode Base64 strings")
+				@toolCard("/tools/jwt", "JWT Decoder", "Decode and inspect JWT tokens")
+				@toolCard("/tools/url", "URL Tools", "Encode, decode, and parse URLs")
+			</div>
+			<h2>Formatters</h2>
+			<div class="grid">
+				@toolCard("/tools/json", "JSON Formatter", "Format, minify, and validate JSON")
+			</div>
+			<h2>Generators</h2>
+			<div class="grid">
+				@toolCard("/tools/hash", "Hash Generator", "Generate MD5, SHA1, SHA256, SHA512 digests")
+				@toolCard("/tools/uuid", "UUID Generator", "Generate, validate, and parse UUIDs")
+			</div>
+		</div>
+		<footer>forge dev · All processing happens locally.</footer>
+	}
+}
+
+templ toolCard(href string, name string, desc string) {
+	<a href={ templ.SafeURL(href) } class="tool-card">
+		<h3>{ name }</h3>
+		<p>{ desc }</p>
+	</a>
+}

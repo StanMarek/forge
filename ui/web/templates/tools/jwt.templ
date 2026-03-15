@@ -1,0 +1,42 @@
+package tools
+
+import "github.com/StanMarek/forge/core/tools"
+import "github.com/StanMarek/forge/ui/web/templates"
+
+templ JWTPage(result tools.JWTDecodeResult, input string) {
+	@templates.Layout("JWT Decoder", "jwt") {
+		<h1 class="tool-title">JWT Decoder</h1>
+		<form hx-post="/tools/jwt" hx-target="#output" hx-swap="outerHTML" hx-trigger="input changed delay:200ms">
+			<div class="input-group">
+				<span class="form-label">JWT Token</span>
+				<textarea name="input" rows="4" placeholder="Paste JWT token (eyJhbG...)">{ input }</textarea>
+			</div>
+			@JWTOutput(result)
+		</form>
+		<footer>All processing happens locally. Signatures are not validated.</footer>
+	}
+}
+
+templ JWTOutput(result tools.JWTDecodeResult) {
+	<div id="output">
+		if result.Error != "" {
+			<div class="output-group">
+				<span class="form-label">Result</span>
+				<div class="error-box">{ result.Error }</div>
+			</div>
+		} else if result.Header != "" {
+			<div class="output-group">
+				<span class="form-label">Header</span>
+				<textarea readonly rows="4">{ result.Header }</textarea>
+			</div>
+			<div class="output-group">
+				<span class="form-label">Payload</span>
+				<textarea readonly rows="6">{ result.Payload }</textarea>
+			</div>
+			<div class="output-group">
+				<span class="form-label">Signature</span>
+				<textarea readonly rows="1">{ result.Signature }</textarea>
+			</div>
+		}
+	</div>
+}

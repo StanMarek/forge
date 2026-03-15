@@ -1,0 +1,46 @@
+package tools
+
+import "github.com/StanMarek/forge/ui/web/templates"
+
+type HashResult struct {
+	MD5    string
+	SHA1   string
+	SHA256 string
+	SHA512 string
+}
+
+templ HashPage(result HashResult, uppercase bool, input string) {
+	@templates.Layout("Hash Generator", "hash") {
+		<h1 class="tool-title">Hash Generator</h1>
+		<form hx-post="/tools/hash" hx-target="#output" hx-swap="outerHTML" hx-trigger="input changed delay:200ms, change">
+			<div class="tool-options">
+				<label class="checkbox-label">
+					<input type="checkbox" name="uppercase" if uppercase { checked }/>
+					Uppercase
+				</label>
+			</div>
+			<div class="input-group">
+				<span class="form-label">Input</span>
+				<textarea name="input" rows="4" placeholder="Enter text to hash...">{ input }</textarea>
+			</div>
+			@HashOutput(result)
+		</form>
+		<footer>All processing happens locally.</footer>
+	}
+}
+
+templ HashOutput(result HashResult) {
+	<div id="output">
+		<div class="output-group">
+			<span class="form-label">Output</span>
+			if result.MD5 != "" {
+				<div class="hash-output">
+					<div><span class="algo">MD5</span> <span class="digest">{ result.MD5 }</span></div>
+					<div><span class="algo">SHA1</span> <span class="digest">{ result.SHA1 }</span></div>
+					<div><span class="algo">SHA256</span> <span class="digest">{ result.SHA256 }</span></div>
+					<div><span class="algo">SHA512</span> <span class="digest">{ result.SHA512 }</span></div>
+				</div>
+			}
+		</div>
+	</div>
+}

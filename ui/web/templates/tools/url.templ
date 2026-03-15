@@ -1,0 +1,56 @@
+package tools
+
+import "github.com/StanMarek/forge/ui/web/templates"
+
+templ URLPage(result string, errMsg string, mode string, component bool, input string) {
+	@templates.Layout("URL Tools", "url") {
+		<h1 class="tool-title">URL Encode / Decode / Parse</h1>
+		<form hx-post="/tools/url" hx-target="#output" hx-swap="outerHTML" hx-trigger="input changed delay:200ms, change">
+			<div class="tool-options">
+				<div class="mode-pills">
+					<label class="mode-pill">
+						<input type="radio" name="mode" value="parse" if mode == "" || mode == "parse" { checked }/>
+						Parse
+					</label>
+					<label class="mode-pill">
+						<input type="radio" name="mode" value="encode" if mode == "encode" { checked }/>
+						Encode
+					</label>
+					<label class="mode-pill">
+						<input type="radio" name="mode" value="decode" if mode == "decode" { checked }/>
+						Decode
+					</label>
+				</div>
+				<label class="checkbox-label">
+					<input type="checkbox" name="component" if component { checked }/>
+					Component mode
+				</label>
+			</div>
+			<div class="input-group">
+				<span class="form-label">Input</span>
+				<textarea name="input" rows="4" placeholder="Enter URL or text...">{ input }</textarea>
+			</div>
+			@URLOutput(result, errMsg)
+		</form>
+		<footer>All processing happens locally.</footer>
+	}
+}
+
+templ URLOutput(result string, errMsg string) {
+	<div id="output">
+		<div class="output-group">
+			<span class="form-label">Output</span>
+			if errMsg != "" {
+				<div class="error-box">{ errMsg }</div>
+			} else {
+				<textarea readonly rows="6">{ result }</textarea>
+			}
+		</div>
+		if result != "" {
+			<div class="actions">
+				<button type="button" class="btn" data-copy-btn onclick="copyOutput()">Copy</button>
+			</div>
+		}
+	</div>
+}
+
