@@ -40,12 +40,10 @@ templ UUIDPage(result string, errMsg string, mode string, version int, uppercase
 					No hyphens
 				</label>
 			</div>
-			if mode == "validate" || mode == "parse" {
-				<div class="input-group">
-					<span class="form-label">UUID Input</span>
-					<textarea name="input" rows="2" placeholder="Enter UUID to validate or parse...">{ input }</textarea>
-				</div>
-			}
+			<div class="input-group">
+				<span class="form-label">UUID Input</span>
+				<textarea name="input" rows="2" placeholder="Enter UUID to validate or parse...">{ input }</textarea>
+			</div>
 			@UUIDOutput(result, errMsg)
 		</form>
 		<footer>All processing happens locally.</footer>

@@ -27,15 +27,15 @@ templ JWTOutput(result tools.JWTDecodeResult) {
 		} else if result.Header != "" {
 			<div class="output-group">
 				<span class="form-label">Header</span>
-				<textarea readonly rows="4">{ result.Header }</textarea>
+				<textarea readonly rows="8" class="auto-height">{ result.Header }</textarea>
 			</div>
 			<div class="output-group">
 				<span class="form-label">Payload</span>
-				<textarea readonly rows="6">{ result.Payload }</textarea>
+				<textarea readonly rows="14" class="auto-height">{ result.Payload }</textarea>
 			</div>
 			<div class="output-group">
 				<span class="form-label">Signature</span>
-				<textarea readonly rows="1">{ result.Signature }</textarea>
+				<textarea readonly rows="3" class="auto-height">{ result.Signature }</textarea>
 			</div>
 		}
 	</div>

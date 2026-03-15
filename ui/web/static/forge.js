@@ -1,3 +1,12 @@
+function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
+}
+
+document.addEventListener('htmx:afterSwap', function() {
+    document.querySelectorAll('.auto-height').forEach(autoResize);
+});
+
 function copyOutput() {
     var output = document.querySelector('#output textarea');
     if (output) {
