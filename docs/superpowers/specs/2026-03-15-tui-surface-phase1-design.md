@@ -42,10 +42,10 @@ var (
     TextPrimary   = lipgloss.Color("#EEFFFF")
     TextSecondary = lipgloss.Color("#B0BEC5")
     TextMuted     = lipgloss.Color("#616161")
-    Accent     = lipgloss.Color("#FF9800")
+    Accent     = lipgloss.Color("#FF9800") // Orange — per CLAUDE.md Material-Darker tokens
     Green      = lipgloss.Color("#C3E88D")
     Cyan       = lipgloss.Color("#89DDFF")
-    Red        = lipgloss.Color("#FF5370")
+    Red        = lipgloss.Color("#FF5370") // Error color per Material-Darker
 )
 ```
 
@@ -89,6 +89,16 @@ type ToolView interface {
 
 Every tool view implements this interface. `AppModel` holds a `ToolView` and delegates `Update`/`View` to it.
 
+**Note on tea.Model conformance:** `ToolView` is NOT `tea.Model` — it returns `(ToolView, tea.Cmd)` from `Update`, not `(tea.Model, tea.Cmd)`. Only `AppModel` implements `tea.Model`. Inside `AppModel.Update`, the call pattern is:
+
+```go
+var cmd tea.Cmd
+m.activeView, cmd = m.activeView.Update(msg)
+return m, cmd
+```
+
+`AppModel.Update` returns `(tea.Model, tea.Cmd)` by returning itself. The `ToolView` is an internal detail — Bubbletea never sees it directly.
+
 ## Model: `ui/tui/app.go` — AppModel
 
 ```go
@@ -126,7 +136,19 @@ type ToolSelectedMsg struct {
 }
 ```
 
-Sidebar emits this when `enter` is pressed. AppModel receives it and swaps the view.
+**Message routing:** `Sidebar.Update` does NOT emit this message directly. Instead, `AppModel.Update` checks if the sidebar's selected item changed after delegating the key event. The pattern:
+
+```go
+// In AppModel.Update, when sidebar is focused:
+prevSelected := m.sidebar.SelectedID()
+m.sidebar, cmd = m.sidebar.Update(msg)
+if key.Matches(msg, keys.Keys.Select) && m.sidebar.SelectedID() != prevSelected {
+    // or simply: if enter was pressed and a tool item is selected
+    m.activeView = createView(m.sidebar.SelectedID(), toolWidth, toolHeight)
+}
+```
+
+This avoids the complexity of the sidebar needing to return `tea.Cmd` messages. `AppModel` owns the routing logic.
 
 ### createView factory
 
@@ -157,7 +179,15 @@ type categoryItem struct {
 }
 ```
 
-Both implement `list.Item`. Category items are rendered differently and cannot be selected (cursor skips them).
+Both implement `list.Item`.
+
+**Category skip behavior:** Do NOT use `bubbles/list.Model` for the sidebar. The standard list does not support non-selectable items natively, and hacking a custom delegate for cursor-skip is fragile. Instead, build a simple custom sidebar model:
+
+- Maintain a `[]sidebarEntry` where each entry is either a category header or a tool item.
+- Track `cursor int` that only lands on tool items (skip category entries in Up/Down handlers).
+- Render manually with lipgloss: category headers styled with `CategoryStyle`, tool items with `NormalItemStyle` / `ActiveItemStyle`.
+
+This is ~80 lines of code and avoids fighting the bubbles list API.
 
 ### Tool list order
 
@@ -171,11 +201,19 @@ Built from `registry.Default()` grouped by category:
 ### State
 
 ```go
+type base64Mode int
+
+const (
+    modeEncode base64Mode = iota
+    modeDecode
+)
+
 type Base64View struct {
     input      textarea.Model
-    output     textarea.Model
-    mode       int  // 0 = encode, 1 = decode
+    output     viewport.Model  // read-only scrollable output (NOT textarea)
+    mode       base64Mode
     urlSafe    bool
+    noPadding  bool
     width      int
     height     int
     err        string
@@ -185,10 +223,10 @@ type Base64View struct {
 ### Behavior
 
 - **Input textarea:** Editable, receives key events when tool panel is focused.
-- **Output textarea:** Read-only, displays result.
+- **Output viewport:** Uses `bubbles/viewport.Model` (NOT textarea — viewport is the idiomatic read-only scrollable component). Content is set via `viewport.SetContent()`.
 - **Mode toggle:** `e` for encode, `d` for decode (when not typing in textarea). Or use `tab` within the tool to cycle between input controls — but simplest approach: mode is toggled via a key binding shown in the view.
-- **Live processing:** Every time input changes, calls `tools.Base64Encode()` or `tools.Base64Decode()` and updates output.
-- **URL-safe toggle:** `u` key toggles the `urlSafe` bool.
+- **Live processing:** Every time input changes, calls `tools.Base64Encode(input, urlSafe, noPadding)` or `tools.Base64Decode(input, urlSafe)` and updates output viewport content. Note: `noPadding` only applies to encode mode; defaults to `false`.
+- **URL-safe toggle:** `ctrl+u` key toggles the `urlSafe` bool.
 - **Error display:** If decode fails, `err` is set and output area shows the error styled with `ErrorStyle`.
 - **View layout:** Title → mode indicator → input textarea → output textarea (or error), stacked vertically.
 
@@ -264,3 +302,4 @@ Modified: `cmd/root.go` (add `tuiCmd` registration)
 - Responsive breakpoints (narrow <80, wide >160)
 - Copy/Paste/Clear buttons
 - `forge` (no subcommand) → auto-launch TUI
+- Do NOT create `ui/tui/banner.go` — detection banner is Phase 2+
