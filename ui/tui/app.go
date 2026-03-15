@@ -135,6 +135,16 @@ func createView(toolID, toolName string, width, height int) views.ToolView {
 	switch toolID {
 	case "base64":
 		view = views.NewBase64View()
+	case "jwt":
+		view = views.NewJWTView()
+	case "json":
+		view = views.NewJSONView()
+	case "hash":
+		view = views.NewHashView()
+	case "url":
+		view = views.NewURLView()
+	case "uuid":
+		view = views.NewUUIDView()
 	default:
 		view = views.NewPlaceholder(toolName)
 	}
