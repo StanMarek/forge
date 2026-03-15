@@ -22,6 +22,7 @@ func init() {
 	rootCmd.AddCommand(hashCmd)
 	rootCmd.AddCommand(urlCmd)
 	rootCmd.AddCommand(uuidCmd)
+	rootCmd.AddCommand(tuiCmd)
 }
 
 // Execute runs the root command.
