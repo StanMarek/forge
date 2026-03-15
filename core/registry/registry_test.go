@@ -135,16 +135,34 @@ func TestRegistryDetectPriority(t *testing.T) {
 func TestDefaultRegistry(t *testing.T) {
 	r := Default()
 	all := r.All()
-	assert.Len(t, all, 6)
+	assert.Len(t, all, 21)
 
 	ids := make(map[string]bool)
 	for _, tool := range all {
 		ids[tool.ID()] = true
 	}
+	// Tier 1
 	assert.True(t, ids["base64"])
 	assert.True(t, ids["jwt"])
 	assert.True(t, ids["json"])
 	assert.True(t, ids["hash"])
 	assert.True(t, ids["url"])
 	assert.True(t, ids["uuid"])
+	// Tier 2
+	assert.True(t, ids["yaml"])
+	assert.True(t, ids["timestamp"])
+	assert.True(t, ids["number-base"])
+	assert.True(t, ids["regex"])
+	assert.True(t, ids["html-entity"])
+	assert.True(t, ids["password"])
+	assert.True(t, ids["lorem"])
+	// High-value additions
+	assert.True(t, ids["color"])
+	assert.True(t, ids["cron"])
+	assert.True(t, ids["text-escape"])
+	assert.True(t, ids["gzip"])
+	assert.True(t, ids["text-stats"])
+	assert.True(t, ids["diff"])
+	assert.True(t, ids["xml"])
+	assert.True(t, ids["csv"])
 }

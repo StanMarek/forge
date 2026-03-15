@@ -35,12 +35,27 @@ type Sidebar struct {
 
 // shortNames maps tool IDs to compact sidebar labels.
 var shortNames = map[string]string{
-	"base64": "Base64",
-	"jwt":    "JWT Decoder",
-	"url":    "URL Tools",
-	"json":   "JSON Formatter",
-	"hash":   "Hash Generator",
-	"uuid":   "UUID Generator",
+	"base64":      "Base64",
+	"jwt":         "JWT Decoder",
+	"url":         "URL Tools",
+	"html-entity": "HTML Entity",
+	"text-escape": "Text Escape",
+	"gzip":        "GZip",
+	"json":        "JSON Formatter",
+	"xml":         "XML Formatter",
+	"hash":        "Hash Generator",
+	"uuid":        "UUID Generator",
+	"password":    "Password Gen",
+	"lorem":       "Lorem Ipsum",
+	"yaml":        "YAML Converter",
+	"timestamp":   "Timestamp",
+	"number-base": "Number Base",
+	"color":       "Color Converter",
+	"cron":        "Cron Parser",
+	"csv":         "JSON ↔ CSV",
+	"regex":       "Regex Tester",
+	"text-stats":  "Text Analyzer",
+	"diff":        "Text Diff",
 }
 
 func sidebarLabel(t tools.Tool) string {
@@ -53,7 +68,7 @@ func sidebarLabel(t tools.Tool) string {
 // NewSidebar creates a sidebar from the registry, grouped by category.
 func NewSidebar(reg *registry.Registry) Sidebar {
 	var entries []sidebarEntry
-	categories := []string{"Encoders", "Formatters", "Generators"}
+	categories := []string{"Encoders", "Formatters", "Generators", "Converters", "Testers", "Text"}
 
 	for _, cat := range categories {
 		toolsInCat := reg.ByCategory(cat)
