@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forge — Developer Workbench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    /* Material-Darker palette */
+    --md-bg:              #212121;
+    --md-surface:         #292929;
+    --md-surface-bright:  #303030;
+    --md-surface-hover:   #323232;
+    --md-contrast:        #1A1A1A;
+    --md-border:          #353535;
+    --md-border-light:    #404040;
+    --md-selection:       #404040;
+
+    /* Text */
+    --md-fg:              #EEFFFF;
+    --md-fg-secondary:    #B0BEC5;
+    --md-fg-muted:        #616161;
+    --md-fg-disabled:     #515151;
+
+    /* Accent — Material-Darker orange */
+    --md-accent:          #FF9800;
+    --md-accent-light:    #FFB74D;
+    --md-accent-dim:      rgba(255, 152, 0, 0.12);
+    --md-accent-glow:     rgba(255, 152, 0, 0.06);
+
+    /* Semantic */
+    --md-red:             #FF5370;
+    --md-red-dim:         rgba(255, 83, 112, 0.1);
+    --md-green:           #C3E88D;
+    --md-green-dim:       rgba(195, 232, 141, 0.12);
+    --md-yellow:          #FFCB6B;
+    --md-blue:            #82AAFF;
+    --md-cyan:            #89DDFF;
+    --md-purple:          #C792EA;
+
+    /* Typography */
+    --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', ui-monospace, monospace;
+    --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --radius: 6px;
+    --radius-lg: 10px;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--md-bg);
+    color: var(--md-fg);
+    line-height: 1.6;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ═══════ Header ═══════ */
+  header {
+    border-bottom: 1px solid var(--md-border);
+    padding: 1.8rem 2rem 1.5rem;
+    max-width: 1140px;
+    margin: 0 auto;
+  }
+  header .logo {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-size: 1.45rem;
+    font-weight: 700;
+    color: var(--md-fg);
+    font-family: var(--font-mono);
+    letter-spacing: -0.01em;
+  }
+  header .logo .anvil {
+    color: var(--md-accent);
+    font-size: 1.25rem;
+  }
+  header .tagline {
+    color: var(--md-fg-secondary);
+    font-size: 0.9rem;
+    margin-top: 0.35rem;
+    letter-spacing: 0.005em;
+  }
+
+  /* ═══════ Search Bar ═══════ */
+  .search-bar {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 1.25rem 2rem 0;
+  }
+  .search-input {
+    width: 100%;
+    padding: 0.65rem 1rem 0.65rem 2.4rem;
+    background: var(--md-surface);
+    border: 1px solid var(--md-border);
+    border-radius: var(--radius);
+    color: var(--md-fg);
+    font-family: var(--font-sans);
+    font-size: 0.88rem;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .search-input::placeholder { color: var(--md-fg-muted); }
+  .search-input:focus {
+    border-color: var(--md-accent);
+    box-shadow: 0 0 0 2px var(--md-accent-dim);
+  }
+  .search-wrap {
+    position: relative;
+  }
+  .search-wrap::before {
+    content: '⌕';
+    position: absolute;
+    left: 0.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--md-fg-muted);
+    font-size: 1rem;
+    pointer-events: none;
+  }
+  .search-wrap .shortcut {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+  .search-wrap .shortcut kbd {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    padding: 0.15rem 0.4rem;
+    background: var(--md-contrast);
+    border: 1px solid var(--md-border);
+    border-radius: 3px;
+    color: var(--md-fg-muted);
+  }
+
+  /* ═══════ Main ═══════ */
+  main {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 1.5rem 2rem 3rem;
+  }
+
+  /* ═══════ Category ═══════ */
+  .category {
+    margin-bottom: 2.2rem;
+  }
+  .category-title {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--md-accent);
+    margin-bottom: 0.7rem;
+    padding-bottom: 0.45rem;
+    border-bottom: 1px solid var(--md-border);
+  }
+
+  /* ═══════ Tool Grid ═══════ */
+  .tool-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 0.6rem;
+  }
+
+  /* ═══════ Tool Card ═══════ */
+  .tool-card {
+    display: block;
+    text-decoration: none;
+    color: var(--md-fg);
+    background: var(--md-surface);
+    border: 1px solid var(--md-border);
+    border-radius: var(--radius);
+    padding: 1rem 1.15rem;
+    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+  }
+  .tool-card:hover {
+    border-color: var(--md-accent);
+    background: var(--md-surface-hover);
+    box-shadow: 0 0 0 1px var(--md-accent-dim), 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .tool-card:active {
+    background: var(--md-selection);
+  }
+  .tool-card h3 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--md-fg);
+  }
+  .tool-card h3 .card-icon {
+    font-size: 0.85rem;
+    width: 1.2rem;
+    text-align: center;
+    color: var(--md-cyan);
+  }
+  .tool-card p {
+    font-size: 0.78rem;
+    color: var(--md-fg-secondary);
+    line-height: 1.45;
+    padding-left: 1.7rem;
+  }
+  .tool-card .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.6rem;
+    font-family: var(--font-mono);
+    background: var(--md-accent-dim);
+    color: var(--md-accent-light);
+    padding: 0.12rem 0.45rem;
+    border-radius: 3px;
+    margin-left: auto;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+  .tool-card .badge::before {
+    content: '';
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--md-accent);
+  }
+
+  /* ═══════ Footer ═══════ */
+  footer {
+    border-top: 1px solid var(--md-border);
+    padding: 1.1rem 2rem;
+    max-width: 1140px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75rem;
+    color: var(--md-fg-muted);
+  }
+  footer .privacy {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--md-fg-secondary);
+  }
+  footer .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--md-green);
+    display: inline-block;
+    box-shadow: 0 0 4px var(--md-green-dim);
+  }
+  footer a {
+    color: var(--md-fg-secondary);
+    text-decoration: none;
+  }
+  footer a:hover {
+    color: var(--md-accent-light);
+  }
+
+  /* ═══════ Responsive ═══════ */
+  @media (max-width: 640px) {
+    header, main, footer, .search-bar { padding-left: 1rem; padding-right: 1rem; }
+    .tool-grid { grid-template-columns: 1fr; }
+    footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span class="anvil">&#9874;</span> Forge</div>
+  <div class="tagline">A developer's workbench for the terminal, browser, and desktop.</div>
+</header>
+
+<div class="search-bar">
+  <div class="search-wrap">
+    <input type="text" class="search-input" placeholder="Search tools..." autofocus>
+    <span class="shortcut"><kbd>/</kbd></span>
+  </div>
+</div>
+
+<main>
+
+  <section class="category">
+    <h2 class="category-title">Encoders</h2>
+    <div class="tool-grid">
+      <a href="mockup-darker-tool-base64.html" class="tool-card">
+        <h3><span class="card-icon">&#128272;</span> Base64 <span class="badge">detect</span></h3>
+        <p>Encode and decode Base64 strings. Supports URL-safe alphabet and padding options.</p>
+      </a>
+      <a href="#" class="tool-card">
+        <h3><span class="card-icon">&#128273;</span> JWT Decoder <span class="badge">detect</span></h3>
+        <p>Decode and inspect JWT tokens. View header, payload, and signature without validation.</p>
+      </a>
+      <a href="#" class="tool-card">
+        <h3><span class="card-icon">&#128279;</span> URL Encode / Decode <span class="badge">detect</span></h3>
+        <p>URL-encode, decode, or parse URLs into components. RFC 3986 compliant.</p>
+      </a>
+      <a href="#" class="tool-card">
+        <h3><span class="card-icon">&#128196;</span> HTML Entity</h3>
+        <p>Encode special characters as HTML entities or decode entities back to characters.</p>
+      </a>
+    </div>
+  </section>
+
+  <section class="category">
+    <h2 class="category-title">Formatters</h2>
+    <div class="tool-grid">
+      <a href="#" class="tool-card">
+        <h3><span class="card-icon">&#123;&#125;</span> JSON Formatter <span class="badge">detect</span></h3>
+        <p>Pretty-print, minify, or validate JSON. Configurable indentation with sort keys option.</p>
+      </a>
+    </div>
+  </section>
+
+  <section class="category">
+    <h2 class="category-title">Generators</h2>
+    <div class="tool-grid">
+      <a href="#" class="tool-card">
+        <h3><span class="card-icon">#</span> Hash Generator</h3>
+        <p>Generate MD5, SHA-1, SHA-256, or SHA-512 hash digests from text or files.</p>
+      </a>
+      <a href="#" class="tool-card">
+        <h3><span class="card-icon">&#128737;</span> UUID Generator <span class="badge">detect</span></h3>
+        <p>Generate v4 (random) or v7 (time-ordered) UUIDs. Validate and parse existing UUIDs.</p>
+      </a>
+      <a href="#" class="tool-card">
+        <h3><span class="card-icon">&#128274;</span> Password Generator</h3>
+        <p>Generate cryptographically random passwords with customizable character sets and length.</p>
+      </a>
+      <a href="#" class="tool-card">
+        <h3><span class="card-icon">&#9998;</span> Lorem Ipsum</h3>
+        <p>Generate placeholder text by words, sentences, or paragraphs.</p>
+      </a>
+    </div>
+  </section>
+
+  <section class="category">
+    <h2 class="category-title">Converters</h2>
+    <div class="tool-grid">
+      <a href="#" class="tool-card">
+        <h3><span class="card-icon">&#8644;</span> JSON / YAML <span class="badge">detect</span></h3>
+        <p>Convert between JSON and YAML formats. Preserves structure and comments where possible.</p>
+      </a>
+      <a href="#" class="tool-card">
+        <h3><span class="card-icon">&#128339;</span> Timestamp <span class="badge">detect</span></h3>
+        <p>Convert between Unix timestamps and human-readable datetime. Timezone-aware.</p>
+      </a>
+      <a href="#" class="tool-card">
+        <h3><span class="card-icon">&#128290;</span> Number Base <span class="badge">detect</span></h3>
+        <p>Convert between decimal, hexadecimal, octal, and binary number systems.</p>
+      </a>
+    </div>
+  </section>
+
+  <section class="category">
+    <h2 class="category-title">Testers</h2>
+    <div class="tool-grid">
+      <a href="#" class="tool-card">
+        <h3><span class="card-icon">.*</span> Regex Tester</h3>
+        <p>Test regular expressions against sample text with highlighted matches and group capture.</p>
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <span>Forge v0.1.0</span>
+  <span class="privacy"><span class="dot"></span> All processing happens locally. Nothing leaves your machine.</span>
+</footer>
+
+
+</body>
+</html>
