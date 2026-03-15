@@ -40,6 +40,8 @@ forge web --port 8080
 6. HTMX swaps `#output` with the response
 7. No full page reload — only the output area updates
 
+**IMPORTANT:** Use `hx-swap="outerHTML"` (or omit — it's the HTMX default). Do NOT use `hx-swap="innerHTML"` — a security hook blocks innerHTML usage in HTML/JS files. The POST response replaces the entire `#output` div.
+
 ### Static Assets
 
 Embedded in the Go binary via `go:embed`. No external CDN, no npm, no build step for frontend.
@@ -239,11 +241,13 @@ func HandleBase64Process(w http.ResponseWriter, r *http.Request) {
     mode := r.FormValue("mode")
     urlSafe := r.FormValue("url-safe") == "on"
 
+    noPadding := r.FormValue("no-padding") == "on"
+
     var result tools.Result
     if mode == "decode" {
         result = tools.Base64Decode(input, urlSafe)
     } else {
-        result = tools.Base64Encode(input, urlSafe, false)
+        result = tools.Base64Encode(input, urlSafe, noPadding)
     }
     templates.Base64Output(result).Render(r.Context(), w)
 }
@@ -260,9 +264,10 @@ func NewRouter() chi.Router {
     r.Use(middleware.Logger)
     r.Use(middleware.Recoverer)
 
-    // Static files
+    // Static files (fs.Sub removes the "static/" prefix from the embedded FS)
+    sub, _ := fs.Sub(staticFS, "static")
     r.Handle("/static/*", http.StripPrefix("/static/",
-        http.FileServerFS(staticFS)))
+        http.FileServerFS(sub)))
 
     // Health
     r.Get("/health", handleHealth)
@@ -288,15 +293,15 @@ func Start(host string, port int) error {
 
 ### Tool-specific handler notes
 
-**hash:** POST receives `input` string. Returns all 4 hash digests in the output fragment (same as TUI — md5, sha1, sha256, sha512 stacked).
+**hash:** POST receives `input` string and `uppercase` checkbox (`== "on"`). Handler calls `tools.Hash(input, algo, uppercase)` FOUR times (md5, sha1, sha256, sha512) and assembles the output into a stacked display. No single `HashAll()` function exists — loop over the 4 algorithms.
 
-**jwt:** POST receives `token` string. Returns decoded header + payload + signature.
+**jwt:** POST receives `token` string. `tools.JWTDecode()` returns `JWTDecodeResult` (NOT `tools.Result`) — the template must be typed to `JWTDecodeResult` with fields `Header`, `Payload`, `Signature`, `Output`, `Error`.
 
-**json:** POST receives `input`, `mode` (format/minify/validate), `sort-keys`, `indent`. Returns formatted/minified output or validation result.
+**json:** POST receives `input`, `mode` (format/minify/validate), `sort-keys` checkbox (`== "on"`), `indent` string (parse with `strconv.Atoi`, default 2 on error). `useTabs` is NOT exposed as a web form field — always `false`. `tools.JSONFormat(input, indent, sortKeys, false)`.
 
-**url:** POST receives `input`, `mode` (parse/encode/decode), `component`. Returns result.
+**url:** POST receives `input`, `mode` (parse/encode/decode), `component` checkbox (`== "on"`). `tools.URLParse()` returns `URLParseResult` (NOT `tools.Result`) — the parse template must be typed to `URLParseResult`. Encode/decode return `tools.Result`.
 
-**uuid:** POST for generate doesn't need input — generates and returns. POST for validate/parse receives `input`.
+**uuid:** POST receives `mode` (generate/validate/parse), `version` string (parse with `strconv.Atoi`, default 4), `uppercase` checkbox, `no-hyphens` checkbox, `input` string (only used in validate/parse modes). `tools.UUIDGenerate(version, uppercase, noHyphens)` for generate. `tools.UUIDParse()` returns `UUIDParseResult` (NOT `tools.Result`) — parse template typed accordingly.
 
 ## Static Files
 
@@ -404,3 +409,5 @@ Modified: `cmd/root.go` (add webCmd)
 - Search on index page
 - Websocket-based live updates (HTMX polling is sufficient)
 - Authentication / multi-user
+- `--open` flag (auto-open browser) — trivial to add later with `exec.Command("open", url)`
+- CSS color tokens intentionally diverge from CLAUDE.md's Material-Darker — the web surface uses a modern dark palette (deeper blacks, crisper contrast) as approved during brainstorming. The TUI keeps Material-Darker; each surface has its own visual identity.
