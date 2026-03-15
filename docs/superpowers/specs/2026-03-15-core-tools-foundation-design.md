@@ -56,7 +56,7 @@ func Base64Decode(input string, urlSafe bool) Result
 - Uses `encoding/base64` stdlib.
 - URL-safe uses RFC 4648 section 5 alphabet.
 - `noPadding` strips trailing `=` characters.
-- Detection: regex `^[A-Za-z0-9+/=\-_]+$`, min 4 chars, length divisible by 4.
+- Detection: standard alphabet only — regex `^[A-Za-z0-9+/=]+$`, min 4 chars, length divisible by 4. URL-safe base64 is not detected (too ambiguous without padding).
 
 ### 2. jwt (`core/tools/jwt.go`)
 
@@ -67,6 +67,7 @@ type JWTDecodeResult struct {
     Header    string
     Payload   string
     Signature string
+    Output    string // Formatted combined output (header + payload + signature)
     Error     string
 }
 
@@ -91,7 +92,7 @@ func JSONValidate(input string) Result
 
 - Uses `encoding/json` stdlib.
 - `JSONFormat` pretty-prints with configurable indent. Default indent: 2 spaces.
-- `sortKeys` requires unmarshaling to `map[string]interface{}` and re-marshaling with sorted keys.
+- `sortKeys` unmarshals to `map[string]interface{}` and re-marshals. Keys are sorted recursively at all nesting levels (Go's `json.Marshal` sorts map keys alphabetically).
 - `JSONValidate` returns `Output: "valid"` or `Error` with position info.
 - Detection: `json.Valid([]byte(input))`.
 
@@ -132,8 +133,8 @@ func URLParse(input string) URLParseResult
 ```
 
 - Uses `net/url` stdlib.
-- `component` mode encodes everything (including `/`, `?`, `&`, `=`).
-- Non-component mode encodes as path-safe (preserves URL structure).
+- `component` mode uses `url.QueryEscape` — encodes everything including `/`, `?`, `&`, `=`. Spaces become `+`.
+- Non-component mode uses `url.PathEscape` — preserves URL structure characters. Spaces become `%20`.
 - Detection: starts with `http://` or `https://`.
 
 ### 6. uuid (`core/tools/uuid.go`)
@@ -156,8 +157,9 @@ func UUIDParse(input string) UUIDParseResult
 ```
 
 - Uses `github.com/google/uuid`.
-- Supports v4 (random) and v7 (time-ordered).
+- Supports v4 (random) and v7 (time-ordered). Returns `Error: "unsupported UUID version: N"` for any other version.
 - `UUIDValidate` returns `Output: "valid (version N)"` or `Error`.
+- Generation of multiple UUIDs (`--count`) is handled by the CLI layer via repeated calls to `UUIDGenerate`.
 - Detection: matches UUID regex `[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}`.
 
 ## Package: `core/registry/`
@@ -177,7 +179,7 @@ func (r *Registry) Detect(clipboard string) []Tool
 ```
 
 - `Search` matches against `Name()`, `ID()`, `Keywords()` (case-insensitive substring).
-- `Detect` calls `DetectFromClipboard` on all registered tools, returns matches sorted by priority: JWT > UUID > URL > JSON > Base64.
+- `Detect` calls `DetectFromClipboard` on all registered tools, returns matches sorted by a hardcoded priority map. Tier-1 priority: JWT > UUID > URL > JSON > Base64. Hash always returns `false`. Full priority order (for future Tier-2 tools): JWT > UUID > URL > JSON > Base64 > Timestamp > HTML entity > Number base. Tools not in the priority map sort after all prioritized tools, in registration order.
 
 ### defaults.go
 
@@ -217,6 +219,12 @@ core/registry/registry.go
 core/registry/registry_test.go
 core/registry/defaults.go
 ```
+
+## Out of Scope
+
+- **`core/detection/`** — The clipboard detection engine (polling, background detection) is out of scope. It depends on `internal/clipboard/` which involves I/O. The registry's `Detect()` method provides the pure detection logic; the detection engine wraps it with clipboard polling in a later milestone.
+- **`cmd/`** — CLI commands are a separate milestone.
+- **`ui/`** — All UI surfaces are separate milestones.
 
 ## Constraints
 
