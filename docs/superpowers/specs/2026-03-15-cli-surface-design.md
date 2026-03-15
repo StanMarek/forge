@@ -39,6 +39,20 @@ var (
 
 Set via `-ldflags` at build time. Defaults allow `go run .` to work without ldflags.
 
+## `main.go`
+
+```go
+package main
+
+import "github.com/StanMarek/forge/cmd"
+
+func main() {
+    cmd.Execute()
+}
+```
+
+That's it. 5 lines. No logic.
+
 ## Package: `cmd/`
 
 ### Input Resolution Pattern
@@ -70,7 +84,9 @@ func Execute() {
 }
 ```
 
-Registers all subcommands in `init()`. No default action — prints help when invoked without subcommand.
+Registers all subcommands in `init()`. No default action yet — prints help when invoked without subcommand. Per doc-07, the eventual behavior is to launch TUI, but that is deferred until the TUI milestone. Add a `// TODO: launch TUI when no subcommand` comment.
+
+Root command also registers `-v` / `--version` flag via Cobra's built-in `rootCmd.Version = version.Version`.
 
 ### version.go
 
@@ -111,8 +127,8 @@ forge jwt validate [token]
 - `decode` flags: `--header-only`, `--payload-only`, `--compact` (all bool).
 - `--header-only`: prints only `result.Header`.
 - `--payload-only`: prints only `result.Payload`.
-- `--compact`: prints JSON on single lines (re-minify the header/payload).
-- `validate`: prints `result.Output` ("valid") or error with exit 1.
+- `--compact`: calls `tools.JSONMinify()` on `result.Header` and `result.Payload` individually, then prints `--- Header ---\n<minified>\n--- Payload ---\n<minified>\n--- Signature ---\n<sig>`. This reuses the existing JSON minify core function.
+- `validate`: prints `result.Output` verbatim ("valid") on success. On error: prints `result.Error` to stderr, exits 1. The core already formats the error message, no prefix needed.
 
 ### json.go
 
@@ -132,11 +148,11 @@ forge json validate [input]
 forge hash <algorithm> [input] [--uppercase] [--file PATH]
 ```
 
-- Single command, not subcommands. Algorithm is the first positional arg.
-- Supported algorithms: md5, sha1, sha256, sha512.
+- Single command, not subcommands. Algorithm is the first positional arg (`args[0]`).
+- Supported algorithms: md5, sha1, sha256, sha512. If algorithm is omitted, print usage error.
 - `--uppercase` (bool): output in uppercase hex.
-- `--file` (string): hash file contents instead of string input. Reads file bytes, passes to `tools.Hash()`.
-- Input resolution: if `--file` is set, read file. Otherwise, resolve from args[1] or stdin.
+- `--file` (string): hash file contents instead of string input. Reads file with `os.ReadFile()`, converts to string via `string(bytes)` (safe in Go — strings are byte slices), passes to `tools.Hash()`.
+- Input resolution: hash uses its own input logic, NOT the shared `resolveInput` helper. If `--file` is set, read file. Otherwise, resolve from `args[1]` (not `args[0]`) or stdin. This is because `args[0]` is consumed by the algorithm name.
 
 ### url.go
 
@@ -149,7 +165,7 @@ forge url parse [input] [--json]
 - Parent command `url` with subcommands: `encode`, `decode`, `parse`.
 - `encode` flag: `--component` (bool).
 - `parse` flag: `--json` (bool) — output as JSON instead of human-readable.
-- For `--json` on parse: marshal `URLParseResult` to JSON (excluding Output and Error fields).
+- For `--json` on parse: create an anonymous struct in the CLI layer that copies the fields from `URLParseResult` excluding `Output` and `Error`, then `json.Marshal` it. Example: `struct{ Scheme, Host, Port, Path, Query, Fragment string; Params map[string][]string }{ ... }`. This avoids modifying core types.
 
 ### uuid.go
 
@@ -163,13 +179,13 @@ forge uuid parse [input] [--json]
 - `generate` flags: `--version int` (default 4), `--count int` (default 1), `--uppercase`, `--no-hyphens`.
 - `--count`: loop calling `tools.UUIDGenerate()` N times, one UUID per line.
 - `parse` flag: `--json` (bool).
-- For `--json` on parse: marshal `UUIDParseResult` to JSON (excluding Output and Error fields).
+- For `--json` on parse: create an anonymous struct in the CLI layer that copies fields from `UUIDParseResult` excluding `Output` and `Error`, then `json.Marshal` it. Same pattern as URL parse.
 
 ## Error Handling
 
 - Tool error (`result.Error != ""`): print to stderr, exit 1.
 - Usage error (wrong flags, missing subcommand): Cobra handles automatically, exit 2.
-- Stdin error (no pipe, no arg): print "no input provided" to stderr, exit 1.
+- Stdin error (no pipe, no arg): `stdin.Read()` returns `errors.New("no input provided")`. The caller prints this error to stderr and exits 1. The error message is owned by `stdin.Read()`, not the caller.
 
 ## Testing Strategy
 
