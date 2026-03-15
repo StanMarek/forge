@@ -131,26 +131,28 @@ func (v *URLView) View() string {
 	var modeStr string
 	switch v.mode {
 	case urlModeParse:
-		modeStr = styles.ModeActiveStyle.Render("(*) Parse") + "  " +
-			styles.ModeInactiveStyle.Render("( ) Encode") + "  " +
-			styles.ModeInactiveStyle.Render("( ) Decode")
+		modeStr = styles.ModeActivePill.Render("Parse") + "  " +
+			styles.ModeInactivePill.Render("Encode") + "  " +
+			styles.ModeInactivePill.Render("Decode")
 	case urlModeEncode:
-		modeStr = styles.ModeInactiveStyle.Render("( ) Parse") + "  " +
-			styles.ModeActiveStyle.Render("(*) Encode") + "  " +
-			styles.ModeInactiveStyle.Render("( ) Decode")
+		modeStr = styles.ModeInactivePill.Render("Parse") + "  " +
+			styles.ModeActivePill.Render("Encode") + "  " +
+			styles.ModeInactivePill.Render("Decode")
 	case urlModeDecode:
-		modeStr = styles.ModeInactiveStyle.Render("( ) Parse") + "  " +
-			styles.ModeInactiveStyle.Render("( ) Encode") + "  " +
-			styles.ModeActiveStyle.Render("(*) Decode")
+		modeStr = styles.ModeInactivePill.Render("Parse") + "  " +
+			styles.ModeInactivePill.Render("Encode") + "  " +
+			styles.ModeActivePill.Render("Decode")
 	}
 
 	options := fmt.Sprintf("Mode: %s", modeStr)
 	if v.mode == urlModeEncode {
-		componentStr := "[ ] Component"
+		var componentStr string
 		if v.component {
-			componentStr = "[x] Component"
+			componentStr = styles.CheckboxOnStyle.Render("● Component")
+		} else {
+			componentStr = styles.CheckboxOffStyle.Render("○ Component")
 		}
-		options += "    " + styles.LabelStyle.Render(componentStr)
+		options += "    " + componentStr
 	}
 
 	inputLabel := styles.LabelStyle.Render("Input:")
@@ -158,15 +160,17 @@ func (v *URLView) View() string {
 
 	var outputSection string
 	if v.err != "" {
-		outputSection = styles.LabelStyle.Render("Error:") + "\n" + styles.ErrorStyle.Render(v.err)
+		outputSection = styles.LabelStyle.Render("Error:") + "\n" + styles.ErrorTextStyle.Render(v.err)
 	} else {
 		outputSection = styles.LabelStyle.Render("Output:") + "\n" + v.output.View()
 	}
 
-	status := styles.StatusBarStyle.Render("ctrl+p: parse  ctrl+e: encode  ctrl+d: decode  ctrl+o: component  tab: switch panel")
+	return fmt.Sprintf("%s\n\n%s\n\n%s\n%s\n\n%s",
+		title, options, inputLabel, inputView, outputSection)
+}
 
-	return fmt.Sprintf("%s\n\n%s\n\n%s\n%s\n\n%s\n\n%s",
-		title, options, inputLabel, inputView, outputSection, status)
+func (v *URLView) KeyHints() string {
+	return hint("ctrl+p", "parse") + "  " + hint("ctrl+e", "encode") + "  " + hint("ctrl+d", "decode") + "  " + hint("ctrl+o", "component")
 }
 
 func (v *URLView) SetSize(width, height int) {

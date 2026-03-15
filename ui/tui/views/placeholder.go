@@ -35,3 +35,5 @@ func (p *PlaceholderView) SetSize(width, height int) {
 	p.width = width
 	p.height = height
 }
+
+func (p *PlaceholderView) KeyHints() string { return "" }

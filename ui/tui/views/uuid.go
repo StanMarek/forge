@@ -164,39 +164,43 @@ func (v *UUIDView) View() string {
 	var modeStr string
 	switch v.mode {
 	case uuidModeGenerate:
-		modeStr = styles.ModeActiveStyle.Render("(●) Generate") + "  " +
-			styles.ModeInactiveStyle.Render("( ) Validate") + "  " +
-			styles.ModeInactiveStyle.Render("( ) Parse")
+		modeStr = styles.ModeActivePill.Render("Generate") + "  " +
+			styles.ModeInactivePill.Render("Validate") + "  " +
+			styles.ModeInactivePill.Render("Parse")
 	case uuidModeValidate:
-		modeStr = styles.ModeInactiveStyle.Render("( ) Generate") + "  " +
-			styles.ModeActiveStyle.Render("(●) Validate") + "  " +
-			styles.ModeInactiveStyle.Render("( ) Parse")
+		modeStr = styles.ModeInactivePill.Render("Generate") + "  " +
+			styles.ModeActivePill.Render("Validate") + "  " +
+			styles.ModeInactivePill.Render("Parse")
 	case uuidModeParse:
-		modeStr = styles.ModeInactiveStyle.Render("( ) Generate") + "  " +
-			styles.ModeInactiveStyle.Render("( ) Validate") + "  " +
-			styles.ModeActiveStyle.Render("(●) Parse")
+		modeStr = styles.ModeInactivePill.Render("Generate") + "  " +
+			styles.ModeInactivePill.Render("Validate") + "  " +
+			styles.ModeActivePill.Render("Parse")
 	}
 
 	versionStr := fmt.Sprintf("v%d", v.version)
 	if v.mode == uuidModeGenerate {
 		if v.version == 4 {
-			versionStr = styles.ModeActiveStyle.Render("(●) v4") + "  " + styles.ModeInactiveStyle.Render("( ) v7")
+			versionStr = styles.ModeActivePill.Render("v4") + "  " + styles.ModeInactivePill.Render("v7")
 		} else {
-			versionStr = styles.ModeInactiveStyle.Render("( ) v4") + "  " + styles.ModeActiveStyle.Render("(●) v7")
+			versionStr = styles.ModeInactivePill.Render("v4") + "  " + styles.ModeActivePill.Render("v7")
 		}
 	}
 
-	uppercaseStr := "☐ Uppercase"
+	var uppercaseStr string
 	if v.uppercase {
-		uppercaseStr = "☑ Uppercase"
+		uppercaseStr = styles.CheckboxOnStyle.Render("● Uppercase")
+	} else {
+		uppercaseStr = styles.CheckboxOffStyle.Render("○ Uppercase")
 	}
-	noHyphensStr := "☐ No hyphens"
+	var noHyphensStr string
 	if v.noHyphens {
-		noHyphensStr = "☑ No hyphens"
+		noHyphensStr = styles.CheckboxOnStyle.Render("● No hyphens")
+	} else {
+		noHyphensStr = styles.CheckboxOffStyle.Render("○ No hyphens")
 	}
 
 	options := fmt.Sprintf("Mode: %s    %s    %s    %s",
-		modeStr, versionStr, styles.LabelStyle.Render(uppercaseStr), styles.LabelStyle.Render(noHyphensStr))
+		modeStr, versionStr, uppercaseStr, noHyphensStr)
 
 	var inputSection string
 	if v.mode == uuidModeGenerate {
@@ -207,20 +211,22 @@ func (v *UUIDView) View() string {
 
 	var outputSection string
 	if v.err != "" {
-		outputSection = styles.LabelStyle.Render("Error:") + "\n" + styles.ErrorStyle.Render(v.err)
+		outputSection = styles.LabelStyle.Render("Error:") + "\n" + styles.ErrorTextStyle.Render(v.err)
 	} else {
 		outputSection = styles.LabelStyle.Render("Output:") + "\n" + v.output.View()
 	}
 
-	status := styles.StatusBarStyle.Render("ctrl+g: generate  ctrl+v: validate  ctrl+p: parse  ctrl+4/7: version  ctrl+u: uppercase  ctrl+n: no-hyphens")
-
 	if v.mode == uuidModeGenerate {
-		return fmt.Sprintf("%s\n\n%s\n\n%s\n\n%s\n\n%s",
-			title, options, outputSection, inputSection, status)
+		return fmt.Sprintf("%s\n\n%s\n\n%s\n\n%s",
+			title, options, outputSection, inputSection)
 	}
 
-	return fmt.Sprintf("%s\n\n%s\n\n%s\n%s\n\n%s\n\n%s",
-		title, options, inputSection, "", outputSection, status)
+	return fmt.Sprintf("%s\n\n%s\n\n%s\n%s\n\n%s",
+		title, options, inputSection, "", outputSection)
+}
+
+func (v *UUIDView) KeyHints() string {
+	return hint("ctrl+g", "generate") + "  " + hint("ctrl+v", "validate") + "  " + hint("ctrl+p", "parse") + "  " + hint("ctrl+u", "uppercase")
 }
 
 func (v *UUIDView) SetSize(width, height int) {

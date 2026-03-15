@@ -116,39 +116,41 @@ func (v *JSONView) View() string {
 	var modeStr string
 	switch v.mode {
 	case jsonModeFormat:
-		modeStr = styles.ModeActiveStyle.Render("(●) Format") + "  " +
-			styles.ModeInactiveStyle.Render("( ) Minify") + "  " +
-			styles.ModeInactiveStyle.Render("( ) Validate")
+		modeStr = styles.ModeActivePill.Render("Format") + "  " +
+			styles.ModeInactivePill.Render("Minify") + "  " +
+			styles.ModeInactivePill.Render("Validate")
 	case jsonModeMinify:
-		modeStr = styles.ModeInactiveStyle.Render("( ) Format") + "  " +
-			styles.ModeActiveStyle.Render("(●) Minify") + "  " +
-			styles.ModeInactiveStyle.Render("( ) Validate")
+		modeStr = styles.ModeInactivePill.Render("Format") + "  " +
+			styles.ModeActivePill.Render("Minify") + "  " +
+			styles.ModeInactivePill.Render("Validate")
 	case jsonModeValidate:
-		modeStr = styles.ModeInactiveStyle.Render("( ) Format") + "  " +
-			styles.ModeInactiveStyle.Render("( ) Minify") + "  " +
-			styles.ModeActiveStyle.Render("(●) Validate")
+		modeStr = styles.ModeInactivePill.Render("Format") + "  " +
+			styles.ModeInactivePill.Render("Minify") + "  " +
+			styles.ModeActivePill.Render("Validate")
 	}
 
-	sortKeysStr := "☐ Sort keys"
+	sortKeysStr := styles.CheckboxOffStyle.Render("○ Sort keys")
 	if v.sortKeys {
-		sortKeysStr = "☑ Sort keys"
+		sortKeysStr = styles.CheckboxOnStyle.Render("● Sort keys")
 	}
-	options := fmt.Sprintf("Mode: %s    %s", modeStr, styles.LabelStyle.Render(sortKeysStr))
+	options := fmt.Sprintf("Mode: %s    %s", modeStr, sortKeysStr)
 
 	inputLabel := styles.LabelStyle.Render("Input:")
 	inputView := v.input.View()
 
 	var outputSection string
 	if v.err != "" {
-		outputSection = styles.LabelStyle.Render("Error:") + "\n" + styles.ErrorStyle.Render(v.err)
+		outputSection = styles.LabelStyle.Render("Error:") + "\n" + styles.ErrorTextStyle.Render(v.err)
 	} else {
 		outputSection = styles.LabelStyle.Render("Output:") + "\n" + v.output.View()
 	}
 
-	status := styles.StatusBarStyle.Render("ctrl+f: format  ctrl+m: minify  ctrl+v: validate  ctrl+s: sort keys  tab: switch panel")
+	return fmt.Sprintf("%s\n\n%s\n\n%s\n%s\n\n%s",
+		title, options, inputLabel, inputView, outputSection)
+}
 
-	return fmt.Sprintf("%s\n\n%s\n\n%s\n%s\n\n%s\n\n%s",
-		title, options, inputLabel, inputView, outputSection, status)
+func (v *JSONView) KeyHints() string {
+	return hint("ctrl+f", "format") + "  " + hint("ctrl+m", "minify") + "  " + hint("ctrl+v", "validate") + "  " + hint("ctrl+s", "sort keys")
 }
 
 func (v *JSONView) SetSize(width, height int) {

@@ -110,17 +110,17 @@ func (v *JWTView) View() string {
 	var modeStr string
 	switch v.mode {
 	case jwtModeFull:
-		modeStr = styles.ModeActiveStyle.Render("(*) Full") + "  " +
-			styles.ModeInactiveStyle.Render("( ) Header") + "  " +
-			styles.ModeInactiveStyle.Render("( ) Payload")
+		modeStr = styles.ModeActivePill.Render("Full") + " " +
+			styles.ModeInactivePill.Render("Header") + " " +
+			styles.ModeInactivePill.Render("Payload")
 	case jwtModeHeader:
-		modeStr = styles.ModeInactiveStyle.Render("( ) Full") + "  " +
-			styles.ModeActiveStyle.Render("(*) Header") + "  " +
-			styles.ModeInactiveStyle.Render("( ) Payload")
+		modeStr = styles.ModeInactivePill.Render("Full") + " " +
+			styles.ModeActivePill.Render("Header") + " " +
+			styles.ModeInactivePill.Render("Payload")
 	case jwtModePayload:
-		modeStr = styles.ModeInactiveStyle.Render("( ) Full") + "  " +
-			styles.ModeInactiveStyle.Render("( ) Header") + "  " +
-			styles.ModeActiveStyle.Render("(*) Payload")
+		modeStr = styles.ModeInactivePill.Render("Full") + " " +
+			styles.ModeInactivePill.Render("Header") + " " +
+			styles.ModeActivePill.Render("Payload")
 	}
 	options := fmt.Sprintf("Mode: %s", modeStr)
 
@@ -129,15 +129,17 @@ func (v *JWTView) View() string {
 
 	var outputSection string
 	if v.err != "" {
-		outputSection = styles.LabelStyle.Render("Error:") + "\n" + styles.ErrorStyle.Render(v.err)
+		outputSection = styles.LabelStyle.Render("Error:") + "\n" + styles.ErrorTextStyle.Render(v.err)
 	} else {
 		outputSection = styles.LabelStyle.Render("Output:") + "\n" + v.output.View()
 	}
 
-	status := styles.StatusBarStyle.Render("ctrl+f: full  ctrl+h: header  ctrl+p: payload  tab: switch panel")
+	return fmt.Sprintf("%s\n\n%s\n\n%s\n%s\n\n%s",
+		title, options, inputLabel, inputView, outputSection)
+}
 
-	return fmt.Sprintf("%s\n\n%s\n\n%s\n%s\n\n%s\n\n%s",
-		title, options, inputLabel, inputView, outputSection, status)
+func (v *JWTView) KeyHints() string {
+	return hint("ctrl+f", "full") + "  " + hint("ctrl+h", "header") + "  " + hint("ctrl+p", "payload")
 }
 
 func (v *JWTView) SetSize(width, height int) {

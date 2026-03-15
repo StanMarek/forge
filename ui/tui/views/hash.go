@@ -81,21 +81,23 @@ func (v *HashView) process() {
 func (v *HashView) View() string {
 	title := styles.TitleStyle.Render("Hash Generator")
 
-	uppercaseStr := "\u2610 Uppercase"
+	uppercaseStr := styles.CheckboxOffStyle.Render("○ Uppercase")
 	if v.uppercase {
-		uppercaseStr = "\u2611 Uppercase"
+		uppercaseStr = styles.CheckboxOnStyle.Render("● Uppercase")
 	}
-	options := styles.LabelStyle.Render(uppercaseStr)
+	options := uppercaseStr
 
 	inputLabel := styles.LabelStyle.Render("Input:")
 	inputView := v.input.View()
 
 	outputSection := styles.LabelStyle.Render("Output:") + "\n" + v.output.View()
 
-	status := styles.StatusBarStyle.Render("ctrl+u: uppercase  tab: switch panel")
+	return fmt.Sprintf("%s\n\n%s\n\n%s\n%s\n\n%s",
+		title, options, inputLabel, inputView, outputSection)
+}
 
-	return fmt.Sprintf("%s\n\n%s\n\n%s\n%s\n\n%s\n\n%s",
-		title, options, inputLabel, inputView, outputSection, status)
+func (v *HashView) KeyHints() string {
+	return hint("ctrl+u", "uppercase")
 }
 
 func (v *HashView) SetSize(width, height int) {

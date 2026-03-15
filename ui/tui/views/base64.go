@@ -111,31 +111,35 @@ func (v *Base64View) View() string {
 
 	var modeStr string
 	if v.mode == modeEncode {
-		modeStr = styles.ModeActiveStyle.Render("(●) Encode") + "  " + styles.ModeInactiveStyle.Render("( ) Decode")
+		modeStr = styles.ModeActivePill.Render("Encode") + " " + styles.ModeInactivePill.Render("Decode")
 	} else {
-		modeStr = styles.ModeInactiveStyle.Render("( ) Encode") + "  " + styles.ModeActiveStyle.Render("(●) Decode")
+		modeStr = styles.ModeInactivePill.Render("Encode") + " " + styles.ModeActivePill.Render("Decode")
 	}
 
-	urlSafeStr := "☐ URL-safe"
+	var urlSafeStr string
 	if v.urlSafe {
-		urlSafeStr = "☑ URL-safe"
+		urlSafeStr = styles.CheckboxOnStyle.Render("● URL-safe")
+	} else {
+		urlSafeStr = styles.CheckboxOffStyle.Render("○ URL-safe")
 	}
-	options := fmt.Sprintf("Mode: %s    %s", modeStr, styles.LabelStyle.Render(urlSafeStr))
+	options := fmt.Sprintf("Mode: %s    %s", modeStr, urlSafeStr)
 
 	inputLabel := styles.LabelStyle.Render("Input:")
 	inputView := v.input.View()
 
 	var outputSection string
 	if v.err != "" {
-		outputSection = styles.LabelStyle.Render("Error:") + "\n" + styles.ErrorStyle.Render(v.err)
+		outputSection = styles.LabelStyle.Render("Error:") + "\n" + styles.ErrorTextStyle.Render(v.err)
 	} else {
 		outputSection = styles.LabelStyle.Render("Output:") + "\n" + v.output.View()
 	}
 
-	status := styles.StatusBarStyle.Render("ctrl+e: encode  ctrl+d: decode  ctrl+u: url-safe  tab: switch panel")
+	return fmt.Sprintf("%s\n\n%s\n\n%s\n%s\n\n%s",
+		title, options, inputLabel, inputView, outputSection)
+}
 
-	return fmt.Sprintf("%s\n\n%s\n\n%s\n%s\n\n%s\n\n%s",
-		title, options, inputLabel, inputView, outputSection, status)
+func (v *Base64View) KeyHints() string {
+	return hint("ctrl+e", "encode") + "  " + hint("ctrl+d", "decode") + "  " + hint("ctrl+u", "url-safe")
 }
 
 func (v *Base64View) SetSize(width, height int) {
