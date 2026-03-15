@@ -8,15 +8,39 @@ templ IndexPage() {
 				@toolCard("/tools/base64", "Base64", "Encode and decode Base64 strings")
 				@toolCard("/tools/jwt", "JWT Decoder", "Decode and inspect JWT tokens")
 				@toolCard("/tools/url", "URL Tools", "Encode, decode, and parse URLs")
+				@toolCard("/tools/html-entity", "HTML Entity", "Encode and decode HTML entities")
+				@toolCard("/tools/text-escape", "Text Escape", "Escape and unescape special characters in text")
+				@toolCard("/tools/gzip", "GZip", "Compress and decompress data using gzip")
 			</div>
 			<h2>Formatters</h2>
 			<div class="grid">
 				@toolCard("/tools/json", "JSON Formatter", "Format, minify, and validate JSON")
+				@toolCard("/tools/xml", "XML Formatter", "Format, pretty-print, and minify XML")
+			</div>
+			<h2>Converters</h2>
+			<div class="grid">
+				@toolCard("/tools/yaml", "JSON / YAML", "Convert between JSON and YAML formats")
+				@toolCard("/tools/csv", "JSON / CSV", "Convert between JSON arrays and CSV")
+				@toolCard("/tools/timestamp", "Timestamp", "Convert between Unix timestamps and human-readable dates")
+				@toolCard("/tools/number-base", "Number Base", "Convert numbers between decimal, hex, octal, and binary")
+				@toolCard("/tools/color", "Color Converter", "Convert colors between hex, RGB, and HSL formats")
+				@toolCard("/tools/cron", "Cron Parser", "Parse cron expressions into human-readable descriptions")
 			</div>
 			<h2>Generators</h2>
 			<div class="grid">
 				@toolCard("/tools/hash", "Hash Generator", "Generate MD5, SHA1, SHA256, SHA512 digests")
 				@toolCard("/tools/uuid", "UUID Generator", "Generate, validate, and parse UUIDs")
+				@toolCard("/tools/password", "Password Generator", "Generate cryptographically secure random passwords")
+				@toolCard("/tools/lorem", "Lorem Ipsum", "Generate lorem ipsum placeholder text")
+			</div>
+			<h2>Testers</h2>
+			<div class="grid">
+				@toolCard("/tools/regex", "Regex Tester", "Test regular expressions against input strings")
+			</div>
+			<h2>Text</h2>
+			<div class="grid">
+				@toolCard("/tools/text-stats", "Text Analyzer", "Analyze text statistics and convert text case")
+				@toolCard("/tools/diff", "Text Diff", "Compare two texts and show differences")
 			</div>
 		</div>
 		<footer>forge dev · All processing happens locally.</footer>

@@ -1,0 +1,46 @@
+package tools
+
+import "github.com/StanMarek/forge/core/tools"
+import "github.com/StanMarek/forge/ui/web/templates"
+
+templ RegexPage(result tools.Result, global bool, pattern string, input string) {
+	@templates.Layout("Regex Tester", "regex") {
+		<h1 class="tool-title">Regex Tester</h1>
+		<form hx-post="/tools/regex" hx-target="#output" hx-swap="outerHTML" hx-trigger="input changed delay:200ms, change">
+			<div class="tool-options">
+				<label class="checkbox-label">
+					<input type="checkbox" name="global" if global { checked }/>
+					Global (find all matches)
+				</label>
+			</div>
+			<div class="input-group">
+				<span class="form-label">Pattern</span>
+				<textarea name="pattern" rows="2" placeholder="Enter regex pattern...">{ pattern }</textarea>
+			</div>
+			<div class="input-group">
+				<span class="form-label">Test String</span>
+				<textarea name="input" rows="6" placeholder="Enter text to test against...">{ input }</textarea>
+			</div>
+			@RegexOutput(result)
+		</form>
+		<footer>All processing happens locally.</footer>
+	}
+}
+
+templ RegexOutput(result tools.Result) {
+	<div id="output">
+		<div class="output-group">
+			<span class="form-label">Output</span>
+			if result.Error != "" {
+				<div class="error-box">{ result.Error }</div>
+			} else {
+				<textarea readonly rows="8">{ result.Output }</textarea>
+			}
+		</div>
+		if result.Output != "" {
+			<div class="actions">
+				<button type="button" class="btn" data-copy-btn onclick="copyOutput()">Copy</button>
+			</div>
+		}
+	</div>
+}

@@ -1,0 +1,48 @@
+package tools
+
+import "github.com/StanMarek/forge/core/tools"
+import "github.com/StanMarek/forge/ui/web/templates"
+
+templ HTMLEntityPage(result tools.Result, mode string, input string) {
+	@templates.Layout("HTML Entity Encoder", "html-entity") {
+		<h1 class="tool-title">HTML Entity Encode / Decode</h1>
+		<form hx-post="/tools/html-entity" hx-target="#output" hx-swap="outerHTML" hx-trigger="input changed delay:200ms, change">
+			<div class="tool-options">
+				<div class="mode-pills">
+					<label class="mode-pill">
+						<input type="radio" name="mode" value="encode" if mode == "" || mode == "encode" { checked }/>
+						Encode
+					</label>
+					<label class="mode-pill">
+						<input type="radio" name="mode" value="decode" if mode == "decode" { checked }/>
+						Decode
+					</label>
+				</div>
+			</div>
+			<div class="input-group">
+				<span class="form-label">Input</span>
+				<textarea name="input" rows="6" placeholder="Enter HTML to encode or encoded text to decode...">{ input }</textarea>
+			</div>
+			@HTMLEntityOutput(result)
+		</form>
+		<footer>All processing happens locally.</footer>
+	}
+}
+
+templ HTMLEntityOutput(result tools.Result) {
+	<div id="output">
+		<div class="output-group">
+			<span class="form-label">Output</span>
+			if result.Error != "" {
+				<div class="error-box">{ result.Error }</div>
+			} else {
+				<textarea readonly rows="6">{ result.Output }</textarea>
+			}
+		</div>
+		if result.Output != "" {
+			<div class="actions">
+				<button type="button" class="btn" data-copy-btn onclick="copyOutput()">Copy</button>
+			</div>
+		}
+	</div>
+}

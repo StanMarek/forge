@@ -1,0 +1,40 @@
+package tools
+
+import "github.com/StanMarek/forge/core/tools"
+import "github.com/StanMarek/forge/ui/web/templates"
+
+templ DiffPage(result tools.Result, textA string, textB string) {
+	@templates.Layout("Text Diff", "diff") {
+		<h1 class="tool-title">Text Diff</h1>
+		<form hx-post="/tools/diff" hx-target="#output" hx-swap="outerHTML" hx-trigger="input changed delay:200ms, change">
+			<div class="input-group">
+				<span class="form-label">Text A</span>
+				<textarea name="text-a" rows="8" placeholder="Enter first text...">{ textA }</textarea>
+			</div>
+			<div class="input-group">
+				<span class="form-label">Text B</span>
+				<textarea name="text-b" rows="8" placeholder="Enter second text...">{ textB }</textarea>
+			</div>
+			@DiffOutput(result)
+		</form>
+		<footer>All processing happens locally.</footer>
+	}
+}
+
+templ DiffOutput(result tools.Result) {
+	<div id="output">
+		<div class="output-group">
+			<span class="form-label">Diff Output</span>
+			if result.Error != "" {
+				<div class="error-box">{ result.Error }</div>
+			} else {
+				<textarea readonly rows="12">{ result.Output }</textarea>
+			}
+		</div>
+		if result.Output != "" {
+			<div class="actions">
+				<button type="button" class="btn" data-copy-btn onclick="copyOutput()">Copy</button>
+			</div>
+		}
+	</div>
+}

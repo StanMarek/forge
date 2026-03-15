@@ -1,0 +1,48 @@
+package tools
+
+import "github.com/StanMarek/forge/core/tools"
+import "github.com/StanMarek/forge/ui/web/templates"
+
+templ GZipPage(result tools.Result, mode string, input string) {
+	@templates.Layout("GZip Compress / Decompress", "gzip") {
+		<h1 class="tool-title">GZip Compress / Decompress</h1>
+		<form hx-post="/tools/gzip" hx-target="#output" hx-swap="outerHTML" hx-trigger="input changed delay:200ms, change">
+			<div class="tool-options">
+				<div class="mode-pills">
+					<label class="mode-pill">
+						<input type="radio" name="mode" value="compress" if mode == "" || mode == "compress" { checked }/>
+						Compress
+					</label>
+					<label class="mode-pill">
+						<input type="radio" name="mode" value="decompress" if mode == "decompress" { checked }/>
+						Decompress
+					</label>
+				</div>
+			</div>
+			<div class="input-group">
+				<span class="form-label">Input</span>
+				<textarea name="input" rows="6" placeholder="Enter text to compress, or base64-encoded gzip data to decompress...">{ input }</textarea>
+			</div>
+			@GZipOutput(result)
+		</form>
+		<footer>All processing happens locally.</footer>
+	}
+}
+
+templ GZipOutput(result tools.Result) {
+	<div id="output">
+		<div class="output-group">
+			<span class="form-label">Output</span>
+			if result.Error != "" {
+				<div class="error-box">{ result.Error }</div>
+			} else {
+				<textarea readonly rows="6">{ result.Output }</textarea>
+			}
+		</div>
+		if result.Output != "" {
+			<div class="actions">
+				<button type="button" class="btn" data-copy-btn onclick="copyOutput()">Copy</button>
+			</div>
+		}
+	</div>
+}

@@ -53,6 +53,51 @@ func NewRouter() chi.Router {
 	r.Get("/tools/uuid", handlers.HandleUUIDPage)
 	r.Post("/tools/uuid", handlers.HandleUUIDProcess)
 
+	r.Get("/tools/yaml", handlers.HandleYAMLPage)
+	r.Post("/tools/yaml", handlers.HandleYAMLProcess)
+
+	r.Get("/tools/timestamp", handlers.HandleTimestampPage)
+	r.Post("/tools/timestamp", handlers.HandleTimestampProcess)
+
+	r.Get("/tools/number-base", handlers.HandleNumberBasePage)
+	r.Post("/tools/number-base", handlers.HandleNumberBaseProcess)
+
+	r.Get("/tools/regex", handlers.HandleRegexPage)
+	r.Post("/tools/regex", handlers.HandleRegexProcess)
+
+	r.Get("/tools/html-entity", handlers.HandleHTMLEntityPage)
+	r.Post("/tools/html-entity", handlers.HandleHTMLEntityProcess)
+
+	r.Get("/tools/password", handlers.HandlePasswordPage)
+	r.Post("/tools/password", handlers.HandlePasswordProcess)
+
+	r.Get("/tools/lorem", handlers.HandleLoremPage)
+	r.Post("/tools/lorem", handlers.HandleLoremProcess)
+
+	r.Get("/tools/color", handlers.HandleColorPage)
+	r.Post("/tools/color", handlers.HandleColorProcess)
+
+	r.Get("/tools/cron", handlers.HandleCronPage)
+	r.Post("/tools/cron", handlers.HandleCronProcess)
+
+	r.Get("/tools/text-escape", handlers.HandleTextEscapePage)
+	r.Post("/tools/text-escape", handlers.HandleTextEscapeProcess)
+
+	r.Get("/tools/gzip", handlers.HandleGZipPage)
+	r.Post("/tools/gzip", handlers.HandleGZipProcess)
+
+	r.Get("/tools/text-stats", handlers.HandleTextStatsPage)
+	r.Post("/tools/text-stats", handlers.HandleTextStatsProcess)
+
+	r.Get("/tools/diff", handlers.HandleDiffPage)
+	r.Post("/tools/diff", handlers.HandleDiffProcess)
+
+	r.Get("/tools/xml", handlers.HandleXMLPage)
+	r.Post("/tools/xml", handlers.HandleXMLProcess)
+
+	r.Get("/tools/csv", handlers.HandleCSVPage)
+	r.Post("/tools/csv", handlers.HandleCSVProcess)
+
 	return r
 }
 

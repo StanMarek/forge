@@ -27,11 +27,29 @@ templ Layout(title string, activeTool string) {
 				<a href="/tools/base64" class={ "sidebar-item", templ.KV("active", activeTool == "base64") }>Base64</a>
 				<a href="/tools/jwt" class={ "sidebar-item", templ.KV("active", activeTool == "jwt") }>JWT Decoder</a>
 				<a href="/tools/url" class={ "sidebar-item", templ.KV("active", activeTool == "url") }>URL Tools</a>
+				<a href="/tools/html-entity" class={ "sidebar-item", templ.KV("active", activeTool == "html-entity") }>HTML Entity</a>
+				<a href="/tools/text-escape" class={ "sidebar-item", templ.KV("active", activeTool == "text-escape") }>Text Escape</a>
+				<a href="/tools/gzip" class={ "sidebar-item", templ.KV("active", activeTool == "gzip") }>GZip</a>
 				<div class="sidebar-category">Formatters</div>
 				<a href="/tools/json" class={ "sidebar-item", templ.KV("active", activeTool == "json") }>JSON Formatter</a>
+				<a href="/tools/xml" class={ "sidebar-item", templ.KV("active", activeTool == "xml") }>XML Formatter</a>
+				<div class="sidebar-category">Converters</div>
+				<a href="/tools/yaml" class={ "sidebar-item", templ.KV("active", activeTool == "yaml") }>JSON / YAML</a>
+				<a href="/tools/csv" class={ "sidebar-item", templ.KV("active", activeTool == "csv") }>JSON / CSV</a>
+				<a href="/tools/timestamp" class={ "sidebar-item", templ.KV("active", activeTool == "timestamp") }>Timestamp</a>
+				<a href="/tools/number-base" class={ "sidebar-item", templ.KV("active", activeTool == "number-base") }>Number Base</a>
+				<a href="/tools/color" class={ "sidebar-item", templ.KV("active", activeTool == "color") }>Color Converter</a>
+				<a href="/tools/cron" class={ "sidebar-item", templ.KV("active", activeTool == "cron") }>Cron Parser</a>
 				<div class="sidebar-category">Generators</div>
 				<a href="/tools/hash" class={ "sidebar-item", templ.KV("active", activeTool == "hash") }>Hash Generator</a>
 				<a href="/tools/uuid" class={ "sidebar-item", templ.KV("active", activeTool == "uuid") }>UUID Generator</a>
+				<a href="/tools/password" class={ "sidebar-item", templ.KV("active", activeTool == "password") }>Password Generator</a>
+				<a href="/tools/lorem" class={ "sidebar-item", templ.KV("active", activeTool == "lorem") }>Lorem Ipsum</a>
+				<div class="sidebar-category">Testers</div>
+				<a href="/tools/regex" class={ "sidebar-item", templ.KV("active", activeTool == "regex") }>Regex Tester</a>
+				<div class="sidebar-category">Text</div>
+				<a href="/tools/text-stats" class={ "sidebar-item", templ.KV("active", activeTool == "text-stats") }>Text Analyzer</a>
+				<a href="/tools/diff" class={ "sidebar-item", templ.KV("active", activeTool == "diff") }>Text Diff</a>
 			</nav>
 			<main>
 				{ children... }

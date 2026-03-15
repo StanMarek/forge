@@ -1,0 +1,52 @@
+package tools
+
+import "github.com/StanMarek/forge/core/tools"
+import "github.com/StanMarek/forge/ui/web/templates"
+
+templ YAMLPage(result tools.Result, mode string, compact bool, input string) {
+	@templates.Layout("JSON / YAML Converter", "yaml") {
+		<h1 class="tool-title">JSON / YAML Converter</h1>
+		<form hx-post="/tools/yaml" hx-target="#output" hx-swap="outerHTML" hx-trigger="input changed delay:200ms, change">
+			<div class="tool-options">
+				<div class="mode-pills">
+					<label class="mode-pill">
+						<input type="radio" name="mode" value="yaml-to-json" if mode == "" || mode == "yaml-to-json" { checked }/>
+						YAML to JSON
+					</label>
+					<label class="mode-pill">
+						<input type="radio" name="mode" value="json-to-yaml" if mode == "json-to-yaml" { checked }/>
+						JSON to YAML
+					</label>
+				</div>
+				<label class="checkbox-label">
+					<input type="checkbox" name="compact" if compact { checked }/>
+					Compact JSON
+				</label>
+			</div>
+			<div class="input-group">
+				<span class="form-label">Input</span>
+				<textarea name="input" rows="8" placeholder="Paste YAML or JSON...">{ input }</textarea>
+			</div>
+			@YAMLOutput(result)
+		</form>
+		<footer>All processing happens locally.</footer>
+	}
+}
+
+templ YAMLOutput(result tools.Result) {
+	<div id="output">
+		<div class="output-group">
+			<span class="form-label">Output</span>
+			if result.Error != "" {
+				<div class="error-box">{ result.Error }</div>
+			} else {
+				<textarea readonly rows="8">{ result.Output }</textarea>
+			}
+		</div>
+		if result.Output != "" {
+			<div class="actions">
+				<button type="button" class="btn" data-copy-btn onclick="copyOutput()">Copy</button>
+			</div>
+		}
+	</div>
+}

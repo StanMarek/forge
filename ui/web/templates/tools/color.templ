@@ -1,0 +1,36 @@
+package tools
+
+import "github.com/StanMarek/forge/core/tools"
+import "github.com/StanMarek/forge/ui/web/templates"
+
+templ ColorPage(result tools.Result, input string) {
+	@templates.Layout("Color Converter", "color") {
+		<h1 class="tool-title">Color Converter</h1>
+		<form hx-post="/tools/color" hx-target="#output" hx-swap="outerHTML" hx-trigger="input changed delay:200ms, change">
+			<div class="input-group">
+				<span class="form-label">Input</span>
+				<textarea name="input" rows="2" placeholder="Enter a color: #ff9800, rgb(255,152,0), hsl(33,100%,50%)...">{ input }</textarea>
+			</div>
+			@ColorOutput(result)
+		</form>
+		<footer>All processing happens locally.</footer>
+	}
+}
+
+templ ColorOutput(result tools.Result) {
+	<div id="output">
+		<div class="output-group">
+			<span class="form-label">Output</span>
+			if result.Error != "" {
+				<div class="error-box">{ result.Error }</div>
+			} else {
+				<textarea readonly rows="4">{ result.Output }</textarea>
+			}
+		</div>
+		if result.Output != "" {
+			<div class="actions">
+				<button type="button" class="btn" data-copy-btn onclick="copyOutput()">Copy</button>
+			</div>
+		}
+	</div>
+}

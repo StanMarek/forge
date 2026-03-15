@@ -1,0 +1,48 @@
+package tools
+
+import "github.com/StanMarek/forge/core/tools"
+import "github.com/StanMarek/forge/ui/web/templates"
+
+templ TextEscapePage(result tools.Result, mode string, input string) {
+	@templates.Layout("Text Escape / Unescape", "text-escape") {
+		<h1 class="tool-title">Text Escape / Unescape</h1>
+		<form hx-post="/tools/text-escape" hx-target="#output" hx-swap="outerHTML" hx-trigger="input changed delay:200ms, change">
+			<div class="tool-options">
+				<div class="mode-pills">
+					<label class="mode-pill">
+						<input type="radio" name="mode" value="escape" if mode == "" || mode == "escape" { checked }/>
+						Escape
+					</label>
+					<label class="mode-pill">
+						<input type="radio" name="mode" value="unescape" if mode == "unescape" { checked }/>
+						Unescape
+					</label>
+				</div>
+			</div>
+			<div class="input-group">
+				<span class="form-label">Input</span>
+				<textarea name="input" rows="6" placeholder="Enter text to escape or unescape...">{ input }</textarea>
+			</div>
+			@TextEscapeOutput(result)
+		</form>
+		<footer>All processing happens locally.</footer>
+	}
+}
+
+templ TextEscapeOutput(result tools.Result) {
+	<div id="output">
+		<div class="output-group">
+			<span class="form-label">Output</span>
+			if result.Error != "" {
+				<div class="error-box">{ result.Error }</div>
+			} else {
+				<textarea readonly rows="6">{ result.Output }</textarea>
+			}
+		</div>
+		if result.Output != "" {
+			<div class="actions">
+				<button type="button" class="btn" data-copy-btn onclick="copyOutput()">Copy</button>
+			</div>
+		}
+	</div>
+}

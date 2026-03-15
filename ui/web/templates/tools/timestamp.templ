@@ -1,0 +1,60 @@
+package tools
+
+import "github.com/StanMarek/forge/core/tools"
+import "github.com/StanMarek/forge/ui/web/templates"
+
+templ TimestampPage(result tools.Result, mode string, millis bool, input string) {
+	@templates.Layout("Timestamp Converter", "timestamp") {
+		<h1 class="tool-title">Timestamp Converter</h1>
+		<form hx-post="/tools/timestamp" hx-target="#output" hx-swap="outerHTML" hx-trigger="input changed delay:200ms, change">
+			<div class="tool-options">
+				<div class="mode-pills">
+					<label class="mode-pill">
+						<input type="radio" name="mode" value="now" if mode == "" || mode == "now" { checked }/>
+						Now
+					</label>
+					<label class="mode-pill">
+						<input type="radio" name="mode" value="from-unix" if mode == "from-unix" { checked }/>
+						From Unix
+					</label>
+					<label class="mode-pill">
+						<input type="radio" name="mode" value="to-unix" if mode == "to-unix" { checked }/>
+						To Unix
+					</label>
+				</div>
+				<label class="checkbox-label">
+					<input type="checkbox" name="millis" if millis { checked }/>
+					Milliseconds
+				</label>
+			</div>
+			<div class="input-group">
+				<span class="form-label">Input</span>
+				<textarea name="input" rows="2" placeholder="Unix timestamp or datetime string (not needed for Now)...">{ input }</textarea>
+			</div>
+			<div class="input-group">
+				<span class="form-label">Timezone</span>
+				<input type="text" name="tz" placeholder="UTC (default), America/New_York, etc." value=""/>
+			</div>
+			@TimestampOutput(result)
+		</form>
+		<footer>All processing happens locally.</footer>
+	}
+}
+
+templ TimestampOutput(result tools.Result) {
+	<div id="output">
+		<div class="output-group">
+			<span class="form-label">Output</span>
+			if result.Error != "" {
+				<div class="error-box">{ result.Error }</div>
+			} else {
+				<textarea readonly rows="6">{ result.Output }</textarea>
+			}
+		</div>
+		if result.Output != "" {
+			<div class="actions">
+				<button type="button" class="btn" data-copy-btn onclick="copyOutput()">Copy</button>
+			</div>
+		}
+	</div>
+}

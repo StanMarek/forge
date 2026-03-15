@@ -1,0 +1,36 @@
+package tools
+
+import "github.com/StanMarek/forge/core/tools"
+import "github.com/StanMarek/forge/ui/web/templates"
+
+templ NumberBasePage(result tools.Result, input string) {
+	@templates.Layout("Number Base Converter", "number-base") {
+		<h1 class="tool-title">Number Base Converter</h1>
+		<form hx-post="/tools/number-base" hx-target="#output" hx-swap="outerHTML" hx-trigger="input changed delay:200ms, change">
+			<div class="input-group">
+				<span class="form-label">Input</span>
+				<textarea name="input" rows="2" placeholder="Enter a number (prefix with 0x for hex, 0b for binary, 0o for octal)...">{ input }</textarea>
+			</div>
+			@NumberBaseOutput(result)
+		</form>
+		<footer>All processing happens locally.</footer>
+	}
+}
+
+templ NumberBaseOutput(result tools.Result) {
+	<div id="output">
+		<div class="output-group">
+			<span class="form-label">Output</span>
+			if result.Error != "" {
+				<div class="error-box">{ result.Error }</div>
+			} else {
+				<textarea readonly rows="5">{ result.Output }</textarea>
+			}
+		</div>
+		if result.Output != "" {
+			<div class="actions">
+				<button type="button" class="btn" data-copy-btn onclick="copyOutput()">Copy</button>
+			</div>
+		}
+	</div>
+}

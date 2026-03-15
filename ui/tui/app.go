@@ -206,6 +206,36 @@ func createView(toolID, toolName string, width, height int) views.ToolView {
 		view = views.NewURLView()
 	case "uuid":
 		view = views.NewUUIDView()
+	case "yaml":
+		view = views.NewYAMLView()
+	case "timestamp":
+		view = views.NewTimestampView()
+	case "number-base":
+		view = views.NewNumberBaseView()
+	case "regex":
+		view = views.NewRegexView()
+	case "html-entity":
+		view = views.NewHTMLEntityView()
+	case "password":
+		view = views.NewPasswordView()
+	case "lorem":
+		view = views.NewLoremView()
+	case "color":
+		view = views.NewColorView()
+	case "cron":
+		view = views.NewCronView()
+	case "text-escape":
+		view = views.NewTextEscapeView()
+	case "gzip":
+		view = views.NewGZipView()
+	case "text-stats":
+		view = views.NewTextStatsView()
+	case "diff":
+		view = views.NewDiffView()
+	case "xml":
+		view = views.NewXMLView()
+	case "csv":
+		view = views.NewCSVView()
 	default:
 		view = views.NewPlaceholder(toolName)
 	}

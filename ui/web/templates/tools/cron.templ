@@ -1,0 +1,36 @@
+package tools
+
+import "github.com/StanMarek/forge/core/tools"
+import "github.com/StanMarek/forge/ui/web/templates"
+
+templ CronPage(result tools.Result, input string) {
+	@templates.Layout("Cron Expression Parser", "cron") {
+		<h1 class="tool-title">Cron Expression Parser</h1>
+		<form hx-post="/tools/cron" hx-target="#output" hx-swap="outerHTML" hx-trigger="input changed delay:200ms, change">
+			<div class="input-group">
+				<span class="form-label">Cron Expression</span>
+				<textarea name="input" rows="2" placeholder="Enter a 5-field cron expression, e.g. */5 * * * *">{ input }</textarea>
+			</div>
+			@CronOutput(result)
+		</form>
+		<footer>All processing happens locally.</footer>
+	}
+}
+
+templ CronOutput(result tools.Result) {
+	<div id="output">
+		<div class="output-group">
+			<span class="form-label">Output</span>
+			if result.Error != "" {
+				<div class="error-box">{ result.Error }</div>
+			} else {
+				<textarea readonly rows="8">{ result.Output }</textarea>
+			}
+		</div>
+		if result.Output != "" {
+			<div class="actions">
+				<button type="button" class="btn" data-copy-btn onclick="copyOutput()">Copy</button>
+			</div>
+		}
+	</div>
+}

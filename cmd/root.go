@@ -34,6 +34,21 @@ func init() {
 	rootCmd.AddCommand(uuidCmd)
 	rootCmd.AddCommand(tuiCmd)
 	rootCmd.AddCommand(webCmd)
+	rootCmd.AddCommand(yamlCmd)
+	rootCmd.AddCommand(timestampCmd)
+	rootCmd.AddCommand(numberBaseCmd)
+	rootCmd.AddCommand(regexCmd)
+	rootCmd.AddCommand(htmlEntityCmd)
+	rootCmd.AddCommand(passwordCmd)
+	rootCmd.AddCommand(loremCmd)
+	rootCmd.AddCommand(colorCmd)
+	rootCmd.AddCommand(cronCmd)
+	rootCmd.AddCommand(textEscapeCmd)
+	rootCmd.AddCommand(gzipCmd)
+	rootCmd.AddCommand(textStatsCmd)
+	rootCmd.AddCommand(diffCmd)
+	rootCmd.AddCommand(xmlCmd)
+	rootCmd.AddCommand(csvCmd)
 }
 
 // Execute runs the root command.
