@@ -1,0 +1,60 @@
+version: 2
+
+before:
+  hooks:
+    - go mod tidy
+    - go generate ./...
+
+builds:
+  - id: forge
+    main: .
+    binary: forge
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X github.com/StanMarek/forge/internal/version.Version={{.Version}}
+      - -X github.com/StanMarek/forge/internal/version.Commit={{.ShortCommit}}
+      - -X github.com/StanMarek/forge/internal/version.Date={{.Date}}
+
+archives:
+  - id: default
+    formats:
+      - tar.gz
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+
+checksum:
+  name_template: "checksums.txt"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^ci:"
+      - "^chore:"
+
+brews:
+  - repository:
+      owner: StanMarek
+      name: homebrew-tap
+      branch: master
+    directory: Formula
+    homepage: "https://github.com/StanMarek/forge"
+    description: "Developer utility toolkit — encoding, hashing, formatting, and generation tools for the terminal, browser, and desktop"
+    license: "MIT"
+    test: |
+      system "#{bin}/forge", "version"
+    install: |
+      bin.install "forge"
+
+release:
+  github:
+    owner: StanMarek
+    name: forge
