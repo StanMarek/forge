@@ -22,6 +22,9 @@ Launch the interactive TUI:
 forge
 ```
 
+<img width="1309" height="677" alt="image" src="https://github.com/user-attachments/assets/1d8752c2-cf7a-4993-bf31-2d452a5816f1" />
+
+
 Use tools directly from the CLI:
 
 ```bash
@@ -38,6 +41,10 @@ Start the web UI:
 ```bash
 forge web
 ```
+
+<img width="1207" height="885" alt="image" src="https://github.com/user-attachments/assets/eb0583af-e7b0-4312-88f1-dc66bb7e19a6" />
+<img width="1200" height="847" alt="image" src="https://github.com/user-attachments/assets/bc73589e-ae6f-4d7c-b3af-c28aa4e5966c" />
+
 
 ## Tools
 
