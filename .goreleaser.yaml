@@ -45,6 +45,7 @@ brews:
       owner: StanMarek
       name: homebrew-tap
       branch: master
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
     directory: Formula
     homepage: "https://github.com/StanMarek/forge"
     description: "Developer utility toolkit — encoding, hashing, formatting, and generation tools for the terminal, browser, and desktop"
